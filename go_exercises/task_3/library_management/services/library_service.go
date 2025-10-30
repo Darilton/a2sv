@@ -1,14 +1,42 @@
 package services
 
-import "library_management/models"
+import (
+	"errors"
+	"library_management/models"
+)
 
 type LibraryManager interface {
 	AddBook(book models.Book)
 	ListAvailableBooks() []models.Book
+	BorrowBook(bookID int, memberID int) error
 }
 
 type Library struct {
-	Books map[int]models.Book
+	Books  map[int]models.Book
+	Member map[int]models.Member
+}
+
+func (l Library) BorrowBook(bookID int, memberID int) error {
+	book, ok := l.Books[bookID]
+	if !ok {
+		return errors.New("book not found in library")
+	}
+
+	if book.Status == "Borrowed" {
+		return errors.New("book is currently not available")
+	}
+
+	member, ok := l.Member[memberID]
+	if !ok {
+		return errors.New("member not found")
+	}
+
+	book.Status = "Borrowed"
+	l.Books[bookID] = book
+	member.BorrowedBooks = append(member.BorrowedBooks, book)
+
+	l.Member[memberID] = member
+	return nil
 }
 
 func (l Library) AddBook(book models.Book) {
