@@ -16,6 +16,16 @@ func Init() {
 	lib.Member = make(map[int]models.Member)
 }
 
+func RemoveBook() {
+	var bookId int
+	fmt.Println("*********Remove Book Menu*********")
+	
+	fmt.Print("Book Id: ")
+	fmt.Scanf("%d", &bookId)
+	lib.RemoveBook(bookId)
+	fmt.Println("Book Removed Successfuly!")
+}
+
 func ListAvailableBooks() {
 	availableBooks := lib.ListAvailableBooks()
 

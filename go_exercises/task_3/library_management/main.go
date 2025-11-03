@@ -31,6 +31,8 @@ func main() {
 			controllers.AddNewBook()
 		case 2:
 			controllers.AddNewMember()
+		case 3:
+			controllers.RemoveBook()
 		case 4:
 			controllers.BorrowBook()
 		case 5:

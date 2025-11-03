@@ -47,6 +47,10 @@ func (l Library) AddMember(member models.Member) {
 	l.Member[member.ID] = member
 }
 
+func (l Library) RemoveBook(bookID int) {
+	delete(l.Books, bookID)
+}
+
 func (l Library) ReturnBook(memberID, bookID int) error {
 	member, ok := l.Member[memberID]
 	if !ok {
