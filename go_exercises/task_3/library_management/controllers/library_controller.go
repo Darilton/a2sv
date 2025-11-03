@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	"bufio"
 	"fmt"
 	"library_management/models"
 	"library_management/services"
+	"os"
+	"strings"
 )
 
 var lib services.Library
@@ -30,14 +33,16 @@ func ListAvailableBooks() {
 
 func AddNewBook() {
 	var book models.Book
-
+	buffer := bufio.NewReader(os.Stdin)
 	fmt.Println("*********Add Book Menu*********")
 	fmt.Print("Book Id: ")
 	fmt.Scanf("%d", &book.ID)
 	fmt.Print("Book Title: ")
-	fmt.Scanln(&book.Title)
+	book.Title, _ = buffer.ReadString('\n')
+	book.Title = strings.TrimSpace(book.Title)
 	fmt.Print("Book Author: ")
-	fmt.Scanln(&book.Author)
+	book.Author, _ = buffer.ReadString('\n')
+	book.Author = strings.TrimSpace(book.Author)
 	book.Status = "Available"
 	lib.AddBook(book)
 
@@ -47,13 +52,15 @@ func AddNewBook() {
 
 func AddNewMember() {
 	var member models.Member
-
+	buffer := bufio.NewReader(os.Stdin)
 	fmt.Println("*********Add Member Menu*********")
 	fmt.Print("Member Id: ")
 	fmt.Scanf("%d", &member.ID)
 	fmt.Print("Member Name: ")
-	fmt.Scanln(&member.Name)
+	member.Name, _ = buffer.ReadString('\n')
+	member.Name = strings.TrimSpace(member.Name)
 
+	lib.AddMember(member)
 	fmt.Println("Member Added Successfuly!")
 	fmt.Println()
 }
