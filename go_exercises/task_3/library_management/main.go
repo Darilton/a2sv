@@ -33,10 +33,12 @@ func main() {
 			controllers.AddNewMember()
 		case 4:
 			controllers.BorrowBook()
-		case 5:
-			controllers.ListAvailableBooks()
 		case 6:
+			controllers.ListAvailableBooks()
+		case 7:
 			controllers.ListMembers()
+		case 8:
+			controllers.ListBorrowedBooks()
 		}
 		if opt != 0 {
 			fmt.Println("Press Enter to go back to main menu")

@@ -64,3 +64,11 @@ func (l Library) ListMembers() []models.Member {
 	}
 	return ans
 }
+
+func (l Library) ListBorrowedBooks(memberID int) []models.Book {
+	member, ok := l.Member[memberID]
+	if !ok {
+		return nil
+	}
+	return member.BorrowedBooks
+}
