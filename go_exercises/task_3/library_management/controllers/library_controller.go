@@ -1,8 +1,10 @@
 package controllers
 
-import "fmt"
-import "library_management/models"
-import "library_management/services"
+import (
+	"fmt"
+	"library_management/models"
+	"library_management/services"
+)
 
 var lib services.Library
 
@@ -28,7 +30,7 @@ func ListAvailableBooks() {
 
 func AddNewBook() {
 	var book models.Book
-	
+
 	fmt.Println("*********Add Book Menu*********")
 	fmt.Print("Book Id: ")
 	fmt.Scanf("%d", &book.ID)
@@ -40,5 +42,18 @@ func AddNewBook() {
 	lib.AddBook(book)
 
 	fmt.Println("Book Added Successfuly!")
+	fmt.Println()
+}
+
+func AddNewMember() {
+	var member models.Member
+
+	fmt.Println("*********Add Member Menu*********")
+	fmt.Print("Member Id: ")
+	fmt.Scanf("%d", &member.ID)
+	fmt.Print("Member Name: ")
+	fmt.Scanln(&member.Name)
+
+	fmt.Println("Member Added Successfuly!")
 	fmt.Println()
 }

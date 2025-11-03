@@ -43,6 +43,10 @@ func (l Library) AddBook(book models.Book) {
 	l.Books[book.ID] = book
 }
 
+func (l Library) AddMember(member models.Member) {
+	l.Member[member.ID] = member
+}
+
 func (l Library) ListAvailableBooks() []models.Book {
 	ans := make([]models.Book, 0)
 	for _, book := range l.Books {
