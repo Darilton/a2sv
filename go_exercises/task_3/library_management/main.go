@@ -31,15 +31,20 @@ func main() {
 			controllers.AddNewBook()
 		case 2:
 			controllers.AddNewMember()
+		case 4:
+			controllers.BorrowBook()
 		case 5:
 			controllers.ListAvailableBooks()
 		case 6:
 			controllers.ListMembers()
 		}
-
-		fmt.Println("Press Enter to go back to main menu")
-		fmt.Scanln(&opt)
-		// clear screen
-		fmt.Print("\033[H\033[2J")
+		if opt != 0 {
+			fmt.Println("Press Enter to go back to main menu")
+			fmt.Scanln(&opt)
+			// clear screen
+			fmt.Print("\033[H\033[2J")
+		} else {
+			fmt.Println("Bye!")
+		}
 	}
 }

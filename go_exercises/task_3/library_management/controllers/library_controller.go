@@ -18,6 +18,9 @@ func Init() {
 
 func ListAvailableBooks() {
 	availableBooks := lib.ListAvailableBooks()
+
+	fmt.Println("*********Available Books Listing Menu*********")
+
 	title := "Available Books:"
 	if len(availableBooks) == 0 {
 		title = "Sorry, there are no books available."
@@ -31,9 +34,31 @@ func ListAvailableBooks() {
 	}
 }
 
+func BorrowBook() {
+	var bookId, memberId int
+
+	fmt.Println("*********Borrow Book Menu*********")
+
+	fmt.Print("Book Id: ")
+	fmt.Scanf("%d", &bookId)
+
+	fmt.Print("Member Id: ")
+	fmt.Scanf("%d", &memberId)
+
+	err := lib.BorrowBook(bookId, memberId)
+	if err != nil {
+		fmt.Println("Failure: ", err)
+	} else {
+		fmt.Println("Book Borrowed Successfuly!")
+	}
+}
+
 func ListMembers() {
 	members := lib.ListMembers()
 	title := "Available Members:"
+
+	fmt.Println("*********Member Listing Menu*********")
+
 	if len(members) == 0 {
 		title = "Sorry, there are no registered members."
 	}
@@ -48,6 +73,7 @@ func ListMembers() {
 func AddNewBook() {
 	var book models.Book
 	buffer := bufio.NewReader(os.Stdin)
+
 	fmt.Println("*********Add Book Menu*********")
 	fmt.Print("Book Id: ")
 	fmt.Scanf("%d", &book.ID)
