@@ -33,6 +33,8 @@ func main() {
 			controllers.AddNewMember()
 		case 4:
 			controllers.BorrowBook()
+		case 5:
+			controllers.ReturnBook()
 		case 6:
 			controllers.ListAvailableBooks()
 		case 7:

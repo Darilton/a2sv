@@ -112,7 +112,7 @@ func ListBorrowedBooks() {
 	fmt.Scanf("%d", &memberID)
 
 	borrowedBooks := lib.ListBorrowedBooks(memberID)
-	if borrowedBooks == nil {
+	if len(borrowedBooks) == 0{
 		fmt.Println("No books borowed by given member")
 	} else {
 		fmt.Println("*********Borrowed Books by Given Member*********")
@@ -122,5 +122,23 @@ func ListBorrowedBooks() {
 		fmt.Println("Book Title: ", book.Title)
 		fmt.Println("Book Author: ", book.Author)
 		fmt.Println()
+	}
+}
+
+func ReturnBook() {
+	var bookID, memberID int
+	fmt.Println("*********Return Book Menu*********")
+	
+	fmt.Print("Book Id: ")
+	fmt.Scanf("%d", &bookID)
+
+	fmt.Print("Member Id: ")
+	fmt.Scanf("%d", &memberID)
+
+	err := lib.ReturnBook(memberID, bookID)
+	if err != nil {
+		fmt.Println("Failure: ", err)
+	} else {
+		fmt.Println("Book Returned Successfully")
 	}
 }

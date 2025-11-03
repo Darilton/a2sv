@@ -47,6 +47,31 @@ func (l Library) AddMember(member models.Member) {
 	l.Member[member.ID] = member
 }
 
+func (l Library) ReturnBook(memberID, bookID int) error {
+	member, ok := l.Member[memberID]
+	if !ok {
+		return errors.New("member not found")
+	}
+
+	book_idx := -1 // flag as not found
+	for i := range len(member.BorrowedBooks) {
+		book := member.BorrowedBooks[i]
+		if book.ID == bookID {
+			book_idx = i
+		}
+	}
+	if book_idx < 0 {
+		return errors.New("book not borowed by given member")
+	}
+
+	book := member.BorrowedBooks[book_idx]
+	book.Status = "Available"
+	l.Books[bookID] = book
+	member.BorrowedBooks = append(member.BorrowedBooks[:book_idx], member.BorrowedBooks[book_idx + 1: ]...)
+	l.Member[memberID] = member
+	return nil
+}
+
 func (l Library) ListAvailableBooks() []models.Book {
 	ans := make([]models.Book, 0)
 	for _, book := range l.Books {
