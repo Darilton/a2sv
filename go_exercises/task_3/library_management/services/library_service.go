@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"library_management/models"
 )
 
@@ -53,6 +54,15 @@ func (l Library) ListAvailableBooks() []models.Book {
 		if book.Status == "Available" {
 			ans = append(ans, book)
 		}
+	}
+	return ans
+}
+
+func (l Library) ListMembers() []models.Member {
+	ans := make([]models.Member, 0)
+	fmt.Println(l.Member)
+	for _, member := range l.Member {
+		ans = append(ans, member)
 	}
 	return ans
 }

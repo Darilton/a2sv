@@ -31,6 +31,20 @@ func ListAvailableBooks() {
 	}
 }
 
+func ListMembers() {
+	members := lib.ListMembers()
+	title := "Available Members:"
+	if len(members) == 0 {
+		title = "Sorry, there are no registered members."
+	}
+	fmt.Println(title)
+	for _, book := range members {
+		fmt.Println("Member Id: ", book.ID)
+		fmt.Println("Member Name: ", book.Name)
+		fmt.Println()
+	}
+}
+
 func AddNewBook() {
 	var book models.Book
 	buffer := bufio.NewReader(os.Stdin)
