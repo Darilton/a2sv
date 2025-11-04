@@ -7,8 +7,12 @@ import (
 
 type LibraryManager interface {
 	AddBook(book models.Book)
+	RemoveBook(bookID int)
+	AddMember(member models.Member)
 	ListAvailableBooks() []models.Book
+	ListBorrowedBooks(memberID int) []models.Book
 	BorrowBook(bookID int, memberID int) error
+	ReturnBook(memberID, bookID int) error
 }
 
 type Library struct {
@@ -71,7 +75,7 @@ func (l Library) ReturnBook(memberID, bookID int) error {
 	book := member.BorrowedBooks[book_idx]
 	book.Status = "Available"
 	l.Books[bookID] = book
-	member.BorrowedBooks = append(member.BorrowedBooks[:book_idx], member.BorrowedBooks[book_idx + 1: ]...)
+	member.BorrowedBooks = append(member.BorrowedBooks[:book_idx], member.BorrowedBooks[book_idx+1:]...)
 	l.Member[memberID] = member
 	return nil
 }
