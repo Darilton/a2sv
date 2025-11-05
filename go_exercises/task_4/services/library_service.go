@@ -13,6 +13,7 @@ type LibraryManager interface {
 	ListBorrowedBooks(memberID int) []models.Book
 	BorrowBook(bookID int, memberID int) error
 	ReturnBook(memberID, bookID int) error
+	ReserveBook(bookID int, memberID int) error
 }
 
 type Library struct {
@@ -53,6 +54,54 @@ func (l Library) AddMember(member models.Member) {
 
 func (l Library) RemoveBook(bookID int) {
 	delete(l.Books, bookID)
+}
+
+func (l Library) ReserveBook(bookID int, memberID int) error {
+	book, ok := l.Books[bookID]
+	if !ok {
+		return errors.New("book not found in library")
+	}
+
+	if book.Status == "Borrowed" || book.Status == "Reserved" {
+		return errors.New("book is currently not available")
+	}
+
+	member, ok := l.Member[memberID]
+	if !ok {
+		return errors.New("member not found")
+	}
+
+	book.Status = "Reserved"
+	l.Books[bookID] = book
+	member.ReservedBooks = append(member.ReservedBooks, book)
+	l.Member[memberID] = member
+	return nil
+}
+
+func (l Library) UnReserveBook(bookID int, memberID int) error {
+	member, ok := l.Member[memberID]
+	if !ok {
+		return errors.New("member not found")
+	}
+
+	book_idx := -1 // flag as not found
+	for i := range len(member.BorrowedBooks) {
+		book := member.BorrowedBooks[i]
+		if book.ID == bookID {
+			book_idx = i
+		}
+	}
+
+	if book_idx < 0 {
+		return errors.New("book not Reserved by given member")
+	}
+
+	book := member.ReservedBooks[book_idx]
+	book.Status = "Available"
+	l.Books[bookID] = book
+	member.ReservedBooks = append(member.ReservedBooks[:book_idx], member.ReservedBooks[book_idx+1:]...)
+	l.Member[memberID] = member
+	return nil
 }
 
 func (l Library) ReturnBook(memberID, bookID int) error {
