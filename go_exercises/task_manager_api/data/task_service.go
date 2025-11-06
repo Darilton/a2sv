@@ -39,7 +39,6 @@ func AddTask(newTask models.Task) error {
 	if ok {
 		return errors.New("task Already Exists")
 	}
-
 	tasks[newTask.Id] = newTask
 	return nil
 }

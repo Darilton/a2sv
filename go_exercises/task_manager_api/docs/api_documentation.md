@@ -13,16 +13,34 @@ A Task in the system consists of the following fields:
 | id          | string | Unique identifier for the task                  |
 | title       | string | Short title or name of the task                |
 | description | string | Detailed description of what the task involves  |
+| due_date    | time.Time | The date by which the task should be completed |
+| status      | string    | The current status of the task (e.g., "pending", "completed") |
 
 ## Pre-seeded Data
 
-The API comes with the following pre-seeded task:
+The API comes with the following pre-seeded tasks:
 
 ```json
 {
     "id": "1",
-    "title": "Complete Task 5",
-    "description": "Complete Task Manager API and push work to github"
+    "title": "Task 1",
+    "description": "First task",
+    "due_date": "2025-11-06T00:00:00Z",
+    "status": "Pending"
+},
+{
+    "id": "2",
+    "title": "Task 2",
+    "description": "Second task",
+    "due_date": "2025-11-07T00:00:00Z",
+    "status": "In Progress"
+},
+{
+    "id": "3",
+    "title": "Task 3",
+    "description": "Third task",
+    "due_date": "2025-11-08T00:00:00Z",
+    "status": "Completed"
 }
 ```
 
@@ -46,7 +64,9 @@ Retrieves a list of all tasks.
     {
       "id": "string",
       "title": "string",
-      "description": "string"
+      "description": "string",
+      "due_date": "time.Time",
+      "status": "string"
     }
   ]
   ```
@@ -56,7 +76,9 @@ Retrieves a list of all tasks.
     {
       "id": "1",
       "title": "Complete Task 5",
-      "description": "Complete Task Manager API and push work to github"
+      "description": "Complete Task Manager API and push work to github",
+      "due_date": "2025-11-06T00:00:00Z",
+      "status": "completed"
     }
   ]
   ```
@@ -74,7 +96,9 @@ Retrieves a specific task by its ID.
   {
     "id": "string",
     "title": "string",
-    "description": "string"
+    "description": "string",
+    "due_date": "time.Time",
+    "status": "string"
   }
   ```
 **Error Response**:
@@ -95,7 +119,9 @@ Creates a new task.
   {
     "id": "string",
     "title": "string",
-    "description": "string"
+    "description": "string",
+    "due_date": "time.Time",
+    "status": "string"
   }
   ```
 **Success Response**:
@@ -129,7 +155,9 @@ Updates an existing task.
   ```json
   {
     "title": "string",
-    "description": "string"
+    "description": "string",
+    "due_date": "time.Time",
+    "status": "string"
   }
   ```
 **Success Response**:
