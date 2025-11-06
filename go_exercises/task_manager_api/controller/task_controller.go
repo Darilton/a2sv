@@ -26,7 +26,7 @@ func AddTask(ctx *gin.Context) {
 	if err := ctx.ShouldBindBodyWithJSON(&newTask); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
-	} 
+	}
 	if err := data.AddTask(newTask); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
