@@ -1,5 +1,8 @@
 # Task Manager API Documentation
 
+## POSTMAN API DOC
+https://documenter.getpostman.com/view/49835401/2sB3WsNJk7
+
 ## Overview
 
 The Task Manager API is a RESTful service that allows you to manage tasks through a simple HTTP interface. It provides endpoints for creating, reading, updating, and deleting tasks (CRUD operations). The API is built using Go and the Gin web framework.
