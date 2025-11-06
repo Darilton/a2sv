@@ -52,3 +52,12 @@ func EditTask(id string, newTask models.Task) error {
 	tasks[task.Id] = task
 	return nil
 }
+
+func DeleteTask(id string) error {
+	task, ok := tasks[id]
+	if !ok {
+		return errors.New("task Not Found")
+	}
+	delete(tasks, task.Id)
+	return nil
+}

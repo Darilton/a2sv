@@ -11,6 +11,7 @@ func GetRouter() *gin.Engine {
 	router.GET("/tasks", controller.GetTasks)
 	router.GET("/tasks/:id", controller.GetTask)
 	router.PUT("/tasks/:id", controller.PutTask)
+	router.DELETE("/tasks/:id", controller.DeleteTask)
 	router.POST("/tasks", controller.AddTask)
 	return router
 }

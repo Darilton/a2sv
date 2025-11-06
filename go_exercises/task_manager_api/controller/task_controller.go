@@ -22,7 +22,7 @@ func GetTask(ctx *gin.Context) {
 
 func AddTask(ctx *gin.Context) {
 	var newTask models.Task
-	
+
 	if err := ctx.ShouldBindBodyWithJSON(&newTask); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -46,4 +46,13 @@ func PutTask(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "Task Updated Successfully!"})
+}
+
+func DeleteTask(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if err := data.DeleteTask(id); err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Task Deleteded Successfully!"})
 }
