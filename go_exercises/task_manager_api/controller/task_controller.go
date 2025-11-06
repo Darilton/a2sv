@@ -20,6 +20,20 @@ func GetTask(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, task)
 }
 
+func AddTask(ctx *gin.Context) {
+	var newTask models.Task
+	
+	if err := ctx.ShouldBindBodyWithJSON(&newTask); err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	} 
+	if err := data.AddTask(newTask); err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Task Added Successfully"})
+}
+
 func PutTask(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var newTask models.Task
