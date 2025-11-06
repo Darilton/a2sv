@@ -3,13 +3,30 @@ package data
 import (
 	"errors"
 	"task_manager_api/models"
+	"time"
 )
 
 var tasks = map[string]models.Task{
 	"1": {
 		Id:          "1",
-		Title:       "Complete Task 5",
-		Description: "Complete Task Manager API and push work to github",
+		Title:       "Task 1",
+		Description: "First task",
+		DueDate:     time.Now(),
+		Status:      "Pending",
+	},
+	"2": {
+		Id:          "2",
+		Title:       "Task 2",
+		Description: "Second task",
+		DueDate:     time.Now().AddDate(0, 0, 1),
+		Status:      "In Progress",
+	},
+	"3": {
+		Id:          "3",
+		Title:       "Task 3",
+		Description: "Third task",
+		DueDate:     time.Now().AddDate(0, 0, 2),
+		Status:      "Completed",
 	},
 }
 
