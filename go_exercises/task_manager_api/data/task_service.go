@@ -7,8 +7,8 @@ import (
 
 var tasks = map[string]models.Task{
 	"1": {
-		Id: "1",
-		Title: "Complete Task 5",
+		Id:          "1",
+		Title:       "Complete Task 5",
 		Description: "Complete Task Manager API and push work to github",
 	},
 }
@@ -27,4 +27,14 @@ func GetTasks() []models.Task {
 		ans = append(ans, task)
 	}
 	return ans
+}
+
+func EditTask(id string, newTask models.Task) error {
+	task, ok := tasks[id]
+	if !ok {
+		return errors.New("task Not Found")
+	}
+	newTask.Id = id
+	tasks[task.Id] = task
+	return nil
 }
