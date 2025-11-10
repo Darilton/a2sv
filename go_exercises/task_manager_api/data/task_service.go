@@ -2,8 +2,12 @@ package data
 
 import (
 	"errors"
+	"fmt"
 	"task_manager_api/models"
 	"time"
+
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 var tasks = map[string]models.Task{
@@ -28,6 +32,19 @@ var tasks = map[string]models.Task{
 		DueDate:     time.Now().AddDate(0, 0, 2),
 		Status:      "Completed",
 	},
+}
+
+var client *mongo.Client
+var coll *mongo.Collection
+
+func ConnectDb(dbUri string) error {
+	clnt, err := mongo.Connect(options.Client().ApplyURI(dbUri))
+	if err != nil {
+		return err
+	}
+	client = clnt
+	coll = client.Database("a2sv").Collection("tasks")
+	return nil
 }
 
 func AddTask(newTask models.Task) error {
