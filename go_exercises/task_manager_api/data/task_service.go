@@ -1,8 +1,8 @@
 package data
 
 import (
+	"context"
 	"errors"
-	"fmt"
 	"task_manager_api/models"
 	"time"
 
@@ -51,12 +51,9 @@ func AddTask(newTask models.Task) error {
 	if newTask.Id == "" || newTask.Title == "" {
 		return errors.New("invalid Request")
 	}
-	// makes shure to add only if task does not exists
-	_, ok := tasks[newTask.Id]
-	if ok {
-		return errors.New("task Already Exists")
+	if _, err := coll.InsertOne(context.TODO(), newTask); err != nil {
+		return err
 	}
-	tasks[newTask.Id] = newTask
 	return nil
 }
 
