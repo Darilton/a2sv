@@ -6,6 +6,7 @@ import (
 	"task_manager_api/models"
 	"time"
 
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
@@ -58,9 +59,10 @@ func AddTask(newTask models.Task) error {
 }
 
 func GetTask(id string) (models.Task, error) {
-	task, ok := tasks[id]
-	if !ok {
-		return task, errors.New("task Not Found")
+	var task models.Task
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "id", Value: id}}).Decode(&task)
+	if err != nil {
+		return task, errors.New("task Not found")
 	}
 	return task, nil
 }
