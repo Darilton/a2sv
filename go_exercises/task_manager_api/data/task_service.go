@@ -82,12 +82,15 @@ func GetTasks() []models.Task {
 }
 
 func EditTask(id string, newTask models.Task) error {
-	task, ok := tasks[id]
-	if !ok {
-		return errors.New("task Not Found")
+	if id != newTask.Id {
+		return errors.New("Invalid Request")
 	}
-	newTask.Id = id
-	tasks[task.Id] = task
+
+	updateResult, _ := coll.ReplaceOne(context.TODO(), bson.D{{Key: "id", Value: id}}, newTask)
+	if updateResult.MatchedCount == 0 {
+		return errors.New("task with given id not found")
+	}
+
 	return nil
 }
 
