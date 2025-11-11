@@ -69,7 +69,13 @@ func GetTask(id string) (models.Task, error) {
 
 func GetTasks() []models.Task {
 	ans := make([]models.Task, 0)
-	for _, task := range tasks {
+	cur, err := coll.Find(context.TODO(), bson.D{{}})
+	if err != nil {
+		return ans
+	}
+	for cur.Next(context.TODO()) {
+		var task models.Task
+		cur.Decode(&task)
 		ans = append(ans, task)
 	}
 	return ans
