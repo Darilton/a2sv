@@ -92,10 +92,9 @@ func EditTask(id string, newTask models.Task) error {
 }
 
 func DeleteTask(id string) error {
-	task, ok := tasks[id]
-	if !ok {
-		return errors.New("task Not Found")
+	deleteResult, _ := coll.DeleteOne(context.TODO(), bson.D{{Key: "id", Value: id}})
+	if deleteResult.DeletedCount == 0 {
+		return errors.New("task with given id not found")
 	}
-	delete(tasks, task.Id)
 	return nil
 }
