@@ -4,24 +4,15 @@ import (
 	"context"
 	"errors"
 	"task_manager_api/models"
-	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-var client *mongo.Client
 var coll *mongo.Collection
 
-func ConnectDb(dbUri string) error {
-	clnt, err := mongo.Connect(options.Client().ApplyURI(dbUri))
-	if err != nil {
-		return err
-	}
-	client = clnt
-	coll = client.Database("a2sv").Collection("tasks")
-	return nil
+func SetTaskCollection(collection *mongo.Collection) {
+	coll = collection
 }
 
 func AddTask(newTask models.Task) error {
