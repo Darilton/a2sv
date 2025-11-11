@@ -9,17 +9,17 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-var coll *mongo.Collection
+var taskColl *mongo.Collection
 
 func SetTaskCollection(collection *mongo.Collection) {
-	coll = collection
+	taskColl = collection
 }
 
 func AddTask(newTask models.Task) error {
 	if newTask.Id == "" || newTask.Title == "" {
 		return errors.New("invalid Request")
 	}
-	if _, err := coll.InsertOne(context.TODO(), newTask); err != nil {
+	if _, err := taskColl.InsertOne(context.TODO(), newTask); err != nil {
 		return err
 	}
 	return nil
@@ -27,7 +27,7 @@ func AddTask(newTask models.Task) error {
 
 func GetTask(id string) (models.Task, error) {
 	var task models.Task
-	err := coll.FindOne(context.TODO(), bson.D{{Key: "id", Value: id}}).Decode(&task)
+	err := taskColl.FindOne(context.TODO(), bson.D{{Key: "id", Value: id}}).Decode(&task)
 	if err != nil {
 		return task, errors.New("task Not found")
 	}
@@ -36,7 +36,7 @@ func GetTask(id string) (models.Task, error) {
 
 func GetTasks() []models.Task {
 	ans := make([]models.Task, 0)
-	cur, err := coll.Find(context.TODO(), bson.D{{}})
+	cur, err := taskColl.Find(context.TODO(), bson.D{{}})
 	if err != nil {
 		return ans
 	}
@@ -53,7 +53,7 @@ func EditTask(id string, newTask models.Task) error {
 		return errors.New("Invalid Request")
 	}
 
-	updateResult, _ := coll.ReplaceOne(context.TODO(), bson.D{{Key: "id", Value: id}}, newTask)
+	updateResult, _ := taskColl.ReplaceOne(context.TODO(), bson.D{{Key: "id", Value: id}}, newTask)
 	if updateResult.MatchedCount == 0 {
 		return errors.New("task with given id not found")
 	}
@@ -62,7 +62,7 @@ func EditTask(id string, newTask models.Task) error {
 }
 
 func DeleteTask(id string) error {
-	deleteResult, _ := coll.DeleteOne(context.TODO(), bson.D{{Key: "id", Value: id}})
+	deleteResult, _ := taskColl.DeleteOne(context.TODO(), bson.D{{Key: "id", Value: id}})
 	if deleteResult.DeletedCount == 0 {
 		return errors.New("task with given id not found")
 	}
