@@ -5,46 +5,34 @@ https://documenter.getpostman.com/view/49835401/2sB3WsNJk7
 
 ## Overview
 
-The Task Manager API is a RESTful service that allows you to manage tasks through a simple HTTP interface. It provides endpoints for creating, reading, updating, and deleting tasks (CRUD operations). The API is built using Go and the Gin web framework.
+The Task Manager API is a RESTful service that allows you to manage tasks through a simple HTTP interface. It provides endpoints for creating, reading, updating, and deleting tasks (CRUD operations). The service now persists data to MongoDB. The Go service uses a small data layer in `data/task_service.go` which expects a MongoDB client to be connected via `ConnectDb(dbUri string)` before handling requests.
 
 ## Task Model
 
 A Task in the system consists of the following fields:
 
-| Field       | Type   | Description                                     |
-|-------------|--------|-------------------------------------------------|
-| id          | string | Unique identifier for the task                  |
-| title       | string | Short title or name of the task                |
-| description | string | Detailed description of what the task involves  |
-| due_date    | time.Time | The date by which the task should be completed |
-| status      | string    | The current status of the task (e.g., "pending", "completed") |
+| Field       | Type       | Description                                     |
+|-------------|------------|-------------------------------------------------|
+| id          | string     | Unique identifier for the task                  |
+| title       | string     | Short title or name of the task                 |
+| description | string     | Detailed description of what the task involves  |
+| due_date    | string     | The date by which the task should be completed (RFC3339 string) |
+| status      | string     | The current status of the task (e.g., "pending", "completed") |
 
-## Pre-seeded Data
+Notes:
+- The service stores tasks in MongoDB in the `a2sv` database, `tasks` collection.
+- `due_date` is serialized as an RFC3339 timestamp string in JSON (e.g. "2025-11-06T00:00:00Z").
 
-The API comes with the following pre-seeded tasks:
+## Pre-seeded Data / Seeding
 
-```json
-{
-    "id": "1",
-    "title": "Task 1",
-    "description": "First task",
-    "due_date": "2025-11-06T00:00:00Z",
-    "status": "Pending"
-},
-{
-    "id": "2",
-    "title": "Task 2",
-    "description": "Second task",
-    "due_date": "2025-11-07T00:00:00Z",
-    "status": "In Progress"
-},
-{
-    "id": "3",
-    "title": "Task 3",
-    "description": "Third task",
-    "due_date": "2025-11-08T00:00:00Z",
-    "status": "Completed"
-}
+This implementation does not include in-memory pre-seeded data. Data is persisted in MongoDB, and the database will retain tasks across service restarts. If you want example data you can seed the database by creating tasks via the API (examples below) or using a MongoDB client.
+
+Example curl to add a task (seed):
+
+```bash
+curl -X POST http://localhost:8080/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"id":"1","title":"Task 1","description":"First task","due_date":"2025-11-06T00:00:00Z","status":"Pending"}'
 ```
 
 ## Base URL
@@ -68,7 +56,7 @@ Retrieves a list of all tasks.
       "id": "string",
       "title": "string",
       "description": "string",
-      "due_date": "time.Time",
+      "due_date": "string",
       "status": "string"
     }
   ]
@@ -100,14 +88,14 @@ Retrieves a specific task by its ID.
     "id": "string",
     "title": "string",
     "description": "string",
-    "due_date": "time.Time",
+    "due_date": "string",
     "status": "string"
   }
   ```
-**Error Response**:
+**Error Response** (when not found):
   ```json
   {
-    "message": "task Not Found"
+    "message": "task Not found"
   }
   ```
 
@@ -123,7 +111,7 @@ Creates a new task.
     "id": "string",
     "title": "string",
     "description": "string",
-    "due_date": "time.Time",
+    "due_date": "string",
     "status": "string"
   }
   ```
@@ -134,17 +122,8 @@ Creates a new task.
   }
   ```
 **Error Responses**:
-  ```json
-  {
-    "error": "invalid Request"
-  }
-  ```
-  or
-  ```json
-  {
-    "error": "task Already Exists"
-  }
-  ```
+  - Missing required fields (service error message): "invalid Request" (this originates from `data.AddTask`).
+  - If a task with the same id already exists the service will return an error (handler-specific message).
 
 ### 4. Update Task
 
@@ -157,9 +136,10 @@ Updates an existing task.
 **Request Body**:
   ```json
   {
+    "id": "string",
     "title": "string",
     "description": "string",
-    "due_date": "time.Time",
+    "due_date": "string",
     "status": "string"
   }
   ```
@@ -169,12 +149,9 @@ Updates an existing task.
     "message": "Task Updated Successfully!"
   }
   ```
-**Error Response**:
-  ```json
-  {
-    "message": "task Not Found"
-  }
-  ```
+**Error Responses**:
+  - If the `id` in the URL does not match the `id` in the body: service returns "Invalid Request".
+  - If no task matches the given id: service returns "task with given id not found".
 
 ### 5. Delete Task
 
@@ -193,6 +170,54 @@ Deletes a task by its ID.
 **Error Response**:
   ```json
   {
-    "error": "task Not Found"
+    "error": "task with given id not found"
   }
   ```
+
+## Notes on behavior and errors
+- The messages quoted above reflect strings returned by the data layer in `data/task_service.go`. HTTP handlers may wrap these into JSON responses with a `message` or `error` field; check the controller for exact HTTP status codes and body shape.
+- Ensure `ConnectDb(dbUri)` is called at startup (see `docs/mongodb.md`) so the data layer can access the `tasks` collection.
+  
+# MongoDB Setup and Seeding
+
+This project persists tasks in MongoDB. This document explains how to run MongoDB locally (or with Docker), set the connection URI, ensure the application connects at startup, and seed example tasks.
+
+## Database and collection
+- Database: `a2sv`
+- Collection: `tasks`
+
+The data layer (`data/task_service.go`) expects a connected MongoDB client and uses `client.Database("a2sv").Collection("tasks")`.
+
+Set the DB URI your app uses. Example URIs:
+
+- Local (no auth): `mongodb://localhost:27017`
+- Atlas or remote (example): `mongodb+srv://<user>:<pass>@cluster0.example.mongodb.net`
+
+**How to provide it to the app**
+
+In main.go call ConnectDb from task_service and pass it your database URI like this:
+
+```
+if err := data.ConnectDb("mongodb://localhost:27017"); err != nil {
+  fmt.Println("Could not connect to database")
+  fmt.Println(err)
+}
+```
+
+## Seeding example tasks
+
+You can seed tasks either by using the API endpoints using curl:
+
+```bash
+curl -X POST http://localhost:8080/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"id":"1","title":"Task 1","description":"First task","due_date":"2025-11-06T00:00:00Z","status":"Pending"}'
+
+curl -X POST http://localhost:8080/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"id":"2","title":"Task 2","description":"Second task","due_date":"2025-11-07T00:00:00Z","status":"In Progress"}'
+
+curl -X POST http://localhost:8080/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"id":"3","title":"Task 3","description":"Third task","due_date":"2025-11-08T00:00:00Z","status":"Completed"}'
+```
