@@ -13,5 +13,7 @@ func GetRouter() *gin.Engine {
 	router.PUT("/tasks/:id", controller.PutTask)
 	router.DELETE("/tasks/:id", controller.DeleteTask)
 	router.POST("/tasks", controller.AddTask)
+
+	router.POST("/register", controller.RegisterUser)
 	return router
 }

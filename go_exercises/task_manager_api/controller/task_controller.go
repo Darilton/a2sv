@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"task_manager_api/data"
 	"task_manager_api/models"
@@ -18,6 +19,28 @@ func GetTask(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, task)
+}
+
+func RegisterUser(ctx *gin.Context) {
+	var newUser models.User
+
+	if err := ctx.ShouldBindBodyWithJSON(&newUser); err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	newUser.Password = string(hashedPassword)
+	if err := data.AddUser(newUser); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "User Registered Successfully"})
 }
 
 func AddTask(ctx *gin.Context) {

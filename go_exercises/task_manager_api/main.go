@@ -18,7 +18,10 @@ func main() {
 		return
 	}
 
+	// Set collections to use for each service class
 	data.SetTaskCollection(clnt.Database(db).Collection("tasks"))
+	data.SetUserCollection(clnt.Database(db).Collection("users"))
+
 	app := router.GetRouter()
 	app.Run(":8080")
 }
