@@ -3,9 +3,9 @@ package data
 import (
 	"context"
 	"errors"
-	"task_manager_api/models"
-	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"task_manager_api/models"
 )
 
 var userColl *mongo.Collection
@@ -33,7 +33,7 @@ func AddUser(newUser models.User) error {
 	// The first user to register is an admin
 	if curr, err := userColl.Find(context.TODO(), bson.D{{}}); err == nil && !curr.Next(context.TODO()) {
 		newUser.UserRole = "admin"
-	}else {
+	} else {
 		newUser.UserRole = "regular"
 	}
 

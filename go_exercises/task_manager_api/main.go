@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"task_manager_api/data"
-	"task_manager_api/router"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"task_manager_api/data"
+	"task_manager_api/router"
 )
 
 var dbUri = "mongodb://localhost:27017"

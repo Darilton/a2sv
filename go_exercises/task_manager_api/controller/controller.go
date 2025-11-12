@@ -1,15 +1,15 @@
 package controller
 
 import (
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"task_manager_api/data"
 	"task_manager_api/models"
 )
 
-var	jwtSecret = []byte("slkfjaslfjdjf!@#$!@#ASDFASDf")
+var jwtSecret = []byte("slkfjaslfjdjf!@#$!@#ASDFASDf")
 
 func GetTasks(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, data.GetTasks())
@@ -42,7 +42,7 @@ func LoginUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
 	}
-	
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": user.UserName,
 		"role":     user.UserRole,
