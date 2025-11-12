@@ -14,6 +14,15 @@ func SetUserCollection(collection *mongo.Collection) {
 	userColl = collection
 }
 
+func GetUser(username string) (models.User, error) {
+	var user models.User
+	err := userColl.FindOne(context.TODO(), bson.D{{Key: "username", Value: username}}).Decode(&user)
+	if err != nil {
+		return user, errors.New("user Not found")
+	}
+	return user, nil
+}
+
 func AddUser(newUser models.User) error {
 	if newUser.Password == "" || newUser.UserName == "" {
 		return errors.New("invalid Request")

@@ -15,5 +15,6 @@ func GetRouter() *gin.Engine {
 	router.POST("/tasks", controller.AddTask)
 
 	router.POST("/register", controller.RegisterUser)
+	router.POST("/login", controller.LoginUser)
 	return router
 }

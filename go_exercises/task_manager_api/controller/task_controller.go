@@ -3,10 +3,13 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"task_manager_api/data"
 	"task_manager_api/models"
 )
+
+var	jwtSecret = []byte("slkfjaslfjdjf!@#$!@#ASDFASDf")
 
 func GetTasks(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, data.GetTasks())
@@ -19,6 +22,37 @@ func GetTask(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, task)
+}
+
+func LoginUser(ctx *gin.Context) {
+	var loginData models.User
+
+	if err := ctx.ShouldBindBodyWithJSON(&loginData); err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	user, err := data.GetUser(loginData.UserName)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginData.Password)); err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+		return
+	}
+	
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"username": user.UserName,
+		"role":     user.UserRole,
+	})
+	jwtToken, err := token.SignedString(jwtSecret)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"token": jwtToken})
 }
 
 func RegisterUser(ctx *gin.Context) {

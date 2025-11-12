@@ -3,9 +3,11 @@ module task_manager_api
 go 1.24.4
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.11.0
 	go.mongodb.org/mongo-driver v1.17.6
 	go.mongodb.org/mongo-driver/v2 v2.4.0
+	golang.org/x/crypto v0.43.0
 )
 
 require (
@@ -40,7 +42,6 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	go.uber.org/mock v0.6.0 // indirect
 	golang.org/x/arch v0.22.0 // indirect
-	golang.org/x/crypto v0.43.0 // indirect
 	golang.org/x/mod v0.29.0 // indirect
 	golang.org/x/net v0.46.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
