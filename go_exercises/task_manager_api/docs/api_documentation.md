@@ -41,6 +41,43 @@ curl -X POST http://localhost:8080/tasks \
 http://localhost:8080
 ```
 
+## Authentication
+
+This API uses JWT-based authentication for protected endpoints. Two public endpoints are available to create users and obtain a token:
+
+- `POST /register` — Register a new user (first registered user becomes `admin`, subsequent users are `regular`).
+- `POST /login` — Login with username and password, returns a JWT token.
+
+Login request example:
+
+```json
+{
+  "username": "alice",
+  "password": "secret"
+}
+```
+
+Login success response:
+
+```json
+{
+  "token": "<jwt_token_here>"
+}
+```
+
+Use the returned token in the `Authorization` header for protected requests:
+
+```
+Authorization: Bearer <jwt_token_here>
+```
+
+Notes on roles and access:
+- The first registered user is automatically assigned the `admin` role (see `data.AddUser`).
+- Endpoints that modify data (`POST /tasks`, `PUT /tasks/:id`, `DELETE /tasks/:id`) require the authenticated user to have `role: "admin"`.
+- Read endpoints (`GET /tasks`, `GET /tasks/:id`) require any valid JWT token.
+
+The middleware stores claim values such as `username` and `role` in the token; handlers expect `username` (or `user_id`) where appropriate.
+
 ## Endpoints
 
 ### 1. Get All Tasks
@@ -49,6 +86,7 @@ Retrieves a list of all tasks.
 
 **URL**: `/tasks`
 **Method**: `GET`
+**Auth**: Required (any authenticated user)
 **Response Format**:
   ```json
   [
@@ -81,6 +119,7 @@ Retrieves a specific task by its ID.
 **URL**: `/tasks/:id`
 **Method**: `GET`
 **URL Parameters**:  `id`
+**Auth**: Required (any authenticated user)
 
 **Success Response**:
   ```json
@@ -105,6 +144,7 @@ Creates a new task.
 
 **URL**: `/tasks`
 **Method**: `POST`
+**Auth**: Required (admin only)
 **Request Body**:
   ```json
   {
@@ -132,6 +172,7 @@ Updates an existing task.
 **URL**: `/tasks/:id`
 **Method**: `PUT`
 **URL Parameters**: `id`
+**Auth**: Required (admin only)
   
 **Request Body**:
   ```json
@@ -160,6 +201,7 @@ Deletes a task by its ID.
 **URL**: `/tasks/:id`
 **Method**: `DELETE`
 **URL Parameters**:  `id`
+**Auth**: Required (admin only)
 
 **Success Response**:
   ```json
