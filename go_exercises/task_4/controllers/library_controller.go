@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"library_management/models"
 	"library_management/services"
+	"library_management/concurrency"
 	"os"
 	"strings"
 )
@@ -14,6 +15,7 @@ var lib services.Library
 func Init() {
 	lib.Books = make(map[int]models.Book)
 	lib.Member = make(map[int]models.Member)
+	concurrency.Init(2)
 }
 
 func RemoveBook() {
@@ -41,6 +43,12 @@ func ListAvailableBooks() {
 		fmt.Println("Book Title: ", book.Title)
 		fmt.Println("Book Author: ", book.Author)
 		fmt.Println()
+	}
+}
+
+func ReserveBook() {
+	for i := range 10 {
+		concurrency.Reserve_book(i, i)
 	}
 }
 
