@@ -14,6 +14,7 @@ type LibraryManager interface {
 	BorrowBook(bookID int, memberID int) error
 	ReturnBook(memberID, bookID int) error
 	ReserveBook(bookID int, memberID int) error
+	UnReserveBook(booID int, memberID int)
 }
 
 type Library struct {
@@ -73,7 +74,6 @@ func (l Library) ReserveBook(bookID int, memberID int) error {
 
 	book.Status = "Reserved"
 	l.Books[bookID] = book
-	member.ReservedBooks = append(member.ReservedBooks, book)
 	l.Member[memberID] = member
 	return nil
 }
@@ -96,6 +96,9 @@ func (l Library) UnReserveBook(bookID int, memberID int) error {
 		return errors.New("book not Reserved by given member")
 	}
 
+	if member.BorrowedBooks[book_idx].Status != "Reserved" {
+		return errors.New("book not in Reserved Status")
+	}
 	book := member.ReservedBooks[book_idx]
 	book.Status = "Available"
 	l.Books[bookID] = book

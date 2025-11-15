@@ -15,7 +15,7 @@ var lib services.Library
 func Init() {
 	lib.Books = make(map[int]models.Book)
 	lib.Member = make(map[int]models.Member)
-	concurrency.Init(2)
+	concurrency.Init(2, lib)
 }
 
 func RemoveBook() {
