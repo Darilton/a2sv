@@ -18,7 +18,12 @@ func auto_cancel_reservation(r reservation) {
 	ch := time.NewTimer(5 * time.Second)
 	<- ch.C
 
-	lib.UnReserveBook(r.bookId, r.memberId)
+	err := lib.UnReserveBook(r.bookId, r.memberId)
+	if err == nil {
+		fmt.Printf("Unreserved Book %d by %d\n", r.bookId, r.memberId)
+	} else {
+		fmt.Printf("%s\n",err.Error())
+	}
 }
 func Init(worker_count int, _lib services.Library) {
 	reserved_chan = make(chan reservation)
@@ -31,7 +36,6 @@ func Init(worker_count int, _lib services.Library) {
 
 	go func() {
 		for reserved := range reserved_chan {
-			fmt.Printf("Book %d reverved by %d\n", reserved.bookId, reserved.memberId)
 			go auto_cancel_reservation(reserved)
 		}
 	}()
@@ -43,7 +47,12 @@ func Reserve_book(bookId, memberId int) {
 
 func reservation_worker(){
 	for reserve := range reserve_chan {
-		lib.ReserveBook(reserve.bookId, reserve.memberId)
+		err := lib.ReserveBook(reserve.bookId, reserve.memberId)
+		if err == nil {
+			fmt.Printf("Book %d reverved by %d\n", reserve.bookId, reserve.memberId)
+		} else {
+			fmt.Printf("Unable to reserve Book %d by %d\n", reserve.bookId, reserve.memberId)
+		}
 		reserved_chan <- reserve
 	}
 }

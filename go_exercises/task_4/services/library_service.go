@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"library_management/models"
 )
 
@@ -11,6 +12,7 @@ type LibraryManager interface {
 	AddMember(member models.Member)
 	ListAvailableBooks() []models.Book
 	ListBorrowedBooks(memberID int) []models.Book
+	ListReservedBooks(memberID int) []models.Book
 	BorrowBook(bookID int, memberID int) error
 	ReturnBook(memberID, bookID int) error
 	ReserveBook(bookID int, memberID int) error
@@ -40,7 +42,7 @@ func (l Library) BorrowBook(bookID int, memberID int) error {
 	book.Status = "Borrowed"
 	l.Books[bookID] = book
 	member.BorrowedBooks = append(member.BorrowedBooks, book)
-
+	fmt.Println(member.BorrowedBooks)
 	l.Member[memberID] = member
 	return nil
 }
@@ -71,9 +73,10 @@ func (l Library) ReserveBook(bookID int, memberID int) error {
 	if !ok {
 		return errors.New("member not found")
 	}
-
 	book.Status = "Reserved"
 	l.Books[bookID] = book
+	member.ReservedBooks = append(member.ReservedBooks, book)
+	fmt.Println(member.ReservedBooks)
 	l.Member[memberID] = member
 	return nil
 }
@@ -85,8 +88,8 @@ func (l Library) UnReserveBook(bookID int, memberID int) error {
 	}
 
 	book_idx := -1 // flag as not found
-	for i := range len(member.BorrowedBooks) {
-		book := member.BorrowedBooks[i]
+	for i := range len(member.ReservedBooks) {
+		book := member.ReservedBooks[i]
 		if book.ID == bookID {
 			book_idx = i
 		}
@@ -96,7 +99,7 @@ func (l Library) UnReserveBook(bookID int, memberID int) error {
 		return errors.New("book not Reserved by given member")
 	}
 
-	if member.BorrowedBooks[book_idx].Status != "Reserved" {
+	if member.ReservedBooks[book_idx].Status != "Reserved" {
 		return errors.New("book not in Reserved Status")
 	}
 	book := member.ReservedBooks[book_idx]
@@ -148,6 +151,14 @@ func (l Library) ListMembers() []models.Member {
 		ans = append(ans, member)
 	}
 	return ans
+}
+
+func (l Library) ListReservedBooks(memberID int) []models.Book {
+	member, ok := l.Member[memberID]
+	if !ok {
+		return nil
+	}
+	return member.ReservedBooks
 }
 
 func (l Library) ListBorrowedBooks(memberID int) []models.Book {

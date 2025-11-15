@@ -122,6 +122,25 @@ func AddNewMember() {
 	fmt.Println("Member Added Successfuly!")
 	fmt.Println()
 }
+func ListReservedBooks() {
+	var memberID int
+	fmt.Println("*********Reserved Books Listing Menu*********")
+	fmt.Print("Member Id: ")
+	fmt.Scanf("%d", &memberID)
+
+	borrowedBooks := lib.ListReservedBooks(memberID)
+	if len(borrowedBooks) == 0 {
+		fmt.Println("No books borowed by given member")
+	} else {
+		fmt.Println("*********Borrowed Books by Given Member*********")
+	}
+	for _, book := range borrowedBooks {
+		fmt.Println("Book Id: ", book.ID)
+		fmt.Println("Book Title: ", book.Title)
+		fmt.Println("Book Author: ", book.Author)
+		fmt.Println()
+	}
+}
 
 func ListBorrowedBooks() {
 	var memberID int
