@@ -4,17 +4,17 @@ import (
 	"net/http"
 	domain "task_manager_api/Domain"
 	"task_manager_api/Infrastructure"
-	"task_manager_api/data"
+	"task_manager_api/Repositories"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetTasks(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, data.GetTasks())
+	ctx.JSON(http.StatusOK, Repositories.GetTasks())
 }
 
 func GetTask(ctx *gin.Context) {
-	task, err := data.GetTask(ctx.Param("id"))
+	task, err := Repositories.GetTask(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
@@ -30,7 +30,7 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 
-	user, err := data.GetUser(loginData.UserName)
+	user, err := Repositories.GetUser(loginData.UserName)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
@@ -64,7 +64,7 @@ func RegisterUser(ctx *gin.Context) {
 	}
 
 	newUser.Password = string(hashedPassword)
-	if err := data.AddUser(newUser); err != nil {
+	if err := Repositories.AddUser(newUser); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -78,7 +78,7 @@ func AddTask(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := data.AddTask(newTask); err != nil {
+	if err := Repositories.AddTask(newTask); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
@@ -92,7 +92,7 @@ func PutTask(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := data.EditTask(id, newTask); err != nil {
+	if err := Repositories.EditTask(id, newTask); err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
@@ -101,7 +101,7 @@ func PutTask(ctx *gin.Context) {
 
 func DeleteTask(ctx *gin.Context) {
 	id := ctx.Param("id")
-	if err := data.DeleteTask(id); err != nil {
+	if err := Repositories.DeleteTask(id); err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
