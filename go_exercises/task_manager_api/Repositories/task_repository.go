@@ -9,6 +9,15 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
+type TaskRepository interface {
+	SetTaskCollection(collection *mongo.Collection)
+	AddTask(newTask domain.Task) error
+	GetTask(id string) (domain.Task, error)
+	GetTasks() []domain.Task
+	EditTask(id string, newTask domain.Task) error
+	DeleteTask(id string) error
+}
+
 var taskColl *mongo.Collection
 
 func SetTaskCollection(collection *mongo.Collection) {

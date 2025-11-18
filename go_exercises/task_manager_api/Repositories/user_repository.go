@@ -9,6 +9,12 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
+type UserRepository interface {
+	SetUserCollection(collection *mongo.Collection)
+	GetUser(username string) (domain.User, error)
+	AddUser(newUser domain.User) error
+}
+
 var userColl *mongo.Collection
 
 func SetUserCollection(collection *mongo.Collection) {

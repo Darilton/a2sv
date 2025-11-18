@@ -3,8 +3,8 @@ package controller
 import (
 	"net/http"
 	domain "task_manager_api/Domain"
-	"task_manager_api/Infrastructure"
 	"task_manager_api/Repositories"
+	usecases "task_manager_api/UseCases"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +14,7 @@ func GetTasks(ctx *gin.Context) {
 }
 
 func GetTask(ctx *gin.Context) {
-	task, err := Repositories.GetTask(ctx.Param("id"))
+	task, err := usecases.GetTask(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
@@ -30,20 +30,9 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 
-	user, err := Repositories.GetUser(loginData.UserName)
+	token, err := usecases.LoginUser(loginData)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
-		return
-	}
-
-	if !Infrastructure.CheckPasswordHash(loginData.Password, user.Password) {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
-		return
-	}
-
-	token, err := Infrastructure.GenerateJWT(user.UserName, user.UserRole)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"token": token})
@@ -57,17 +46,11 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 
-	hashedPassword, err := Infrastructure.HashPassword(newUser.Password)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		return
-	}
-
-	newUser.Password = string(hashedPassword)
-	if err := Repositories.AddUser(newUser); err != nil {
+	if err := usecases.RegisterUser(newUser); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	ctx.JSON(http.StatusOK, gin.H{"message": "User Registered Successfully"})
 }
 
@@ -78,7 +61,7 @@ func AddTask(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := Repositories.AddTask(newTask); err != nil {
+	if err := usecases.AddTask(newTask); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
@@ -92,7 +75,7 @@ func PutTask(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := Repositories.EditTask(id, newTask); err != nil {
+	if err := usecases.EditTask(id, newTask); err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
@@ -101,7 +84,7 @@ func PutTask(ctx *gin.Context) {
 
 func DeleteTask(ctx *gin.Context) {
 	id := ctx.Param("id")
-	if err := Repositories.DeleteTask(id); err != nil {
+	if err := usecases.DeleteTask(id); err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
