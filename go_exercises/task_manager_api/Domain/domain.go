@@ -1,4 +1,4 @@
-package models
+package domain
 
 import "time"
 
@@ -8,4 +8,10 @@ type Task struct {
 	Description string    `json:"description"`
 	DueDate     time.Time `json:"due_date"`
 	Status      string    `json:"status"`
+}
+
+type User struct {
+	UserName string `json:"username"`
+	Password string `json:"password"`
+	UserRole string `json:"-"`
 }

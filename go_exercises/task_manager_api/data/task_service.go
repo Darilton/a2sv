@@ -3,7 +3,7 @@ package data
 import (
 	"context"
 	"errors"
-	"task_manager_api/models"
+	"task_manager_api/domain"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -15,7 +15,7 @@ func SetTaskCollection(collection *mongo.Collection) {
 	taskColl = collection
 }
 
-func AddTask(newTask models.Task) error {
+func AddTask(newTask domain.Task) error {
 	if newTask.Id == "" || newTask.Title == "" {
 		return errors.New("invalid Request")
 	}
@@ -25,8 +25,8 @@ func AddTask(newTask models.Task) error {
 	return nil
 }
 
-func GetTask(id string) (models.Task, error) {
-	var task models.Task
+func GetTask(id string) (domain.Task, error) {
+	var task domain.Task
 	err := taskColl.FindOne(context.TODO(), bson.D{{Key: "id", Value: id}}).Decode(&task)
 	if err != nil {
 		return task, errors.New("task Not found")
@@ -34,21 +34,21 @@ func GetTask(id string) (models.Task, error) {
 	return task, nil
 }
 
-func GetTasks() []models.Task {
-	ans := make([]models.Task, 0)
+func GetTasks() []domain.Task {
+	ans := make([]domain.Task, 0)
 	cur, err := taskColl.Find(context.TODO(), bson.D{{}})
 	if err != nil {
 		return ans
 	}
 	for cur.Next(context.TODO()) {
-		var task models.Task
+		var task domain.Task
 		cur.Decode(&task)
 		ans = append(ans, task)
 	}
 	return ans
 }
 
-func EditTask(id string, newTask models.Task) error {
+func EditTask(id string, newTask domain.Task) error {
 	if id != newTask.Id {
 		return errors.New("Invalid Request")
 	}

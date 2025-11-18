@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
-	"task_manager_api/data"
 	"task_manager_api/Delivery/router"
+	"task_manager_api/data"
 )
 
 var dbUri = "mongodb://localhost:27017"

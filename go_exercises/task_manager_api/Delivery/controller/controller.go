@@ -1,12 +1,13 @@
 package controller
 
 import (
+	"net/http"
+	"task_manager_api/data"
+	"task_manager_api/domain"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
-	"task_manager_api/data"
-	"task_manager_api/models"
 )
 
 var jwtSecret = []byte("slkfjaslfjdjf!@#$!@#ASDFASDf")
@@ -25,7 +26,7 @@ func GetTask(ctx *gin.Context) {
 }
 
 func LoginUser(ctx *gin.Context) {
-	var loginData models.User
+	var loginData domain.User
 
 	if err := ctx.ShouldBindBodyWithJSON(&loginData); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
@@ -56,7 +57,7 @@ func LoginUser(ctx *gin.Context) {
 }
 
 func RegisterUser(ctx *gin.Context) {
-	var newUser models.User
+	var newUser domain.User
 
 	if err := ctx.ShouldBindBodyWithJSON(&newUser); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
@@ -78,7 +79,7 @@ func RegisterUser(ctx *gin.Context) {
 }
 
 func AddTask(ctx *gin.Context) {
-	var newTask models.Task
+	var newTask domain.Task
 
 	if err := ctx.ShouldBindBodyWithJSON(&newTask); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
@@ -93,7 +94,7 @@ func AddTask(ctx *gin.Context) {
 
 func PutTask(ctx *gin.Context) {
 	id := ctx.Param("id")
-	var newTask models.Task
+	var newTask domain.Task
 	if err := ctx.ShouldBindBodyWithJSON(&newTask); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
