@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"task_manager_api/controller"
+	"task_manager_api/Delivery/controller"
 	"task_manager_api/middleware"
 )
 
