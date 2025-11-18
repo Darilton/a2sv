@@ -3,7 +3,7 @@ package data
 import (
 	"context"
 	"errors"
-	"task_manager_api/domain"
+	domain "task_manager_api/Domain"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"

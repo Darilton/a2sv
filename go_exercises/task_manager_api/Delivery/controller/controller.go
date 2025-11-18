@@ -3,7 +3,7 @@ package controller
 import (
 	"net/http"
 	"task_manager_api/data"
-	"task_manager_api/domain"
+	domain "task_manager_api/Domain"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"

@@ -3,7 +3,7 @@ package data
 import (
 	"context"
 	"errors"
-	"task_manager_api/domain"
+	domain "task_manager_api/Domain"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -50,7 +50,7 @@ func GetTasks() []domain.Task {
 
 func EditTask(id string, newTask domain.Task) error {
 	if id != newTask.Id {
-		return errors.New("Invalid Request")
+		return errors.New("invalid Request")
 	}
 
 	updateResult, _ := taskColl.ReplaceOne(context.TODO(), bson.D{{Key: "id", Value: id}}, newTask)
