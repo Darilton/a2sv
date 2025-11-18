@@ -1,9 +1,10 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
 	"task_manager_api/Delivery/controller"
-	"task_manager_api/middleware"
+	middleware "task_manager_api/Infrastructure"
+
+	"github.com/gin-gonic/gin"
 )
 
 func GetRouter() *gin.Engine {

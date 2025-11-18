@@ -1,12 +1,12 @@
-package middleware
+package Infrastructure
 
-import "strings"
-import "github.com/gin-gonic/gin"
-import "github.com/dgrijalva/jwt-go"
-import "net/http"
-import "fmt"
+import (
+	"net/http"
+	"strings"
 
-var jwtSecret = []byte("slkfjaslfjdjf!@#$!@#ASDFASDf")
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+)
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -24,12 +24,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// parse token and populate MapClaims so we can read claims easily
 		claims := jwt.MapClaims{}
-		token, err := jwt.ParseWithClaims(authParts[1], claims, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-			}
-			return jwtSecret, nil
-		})
+		token, err := ValidateToken(authParts[1], &claims)
 
 		if err != nil || !token.Valid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid JWT"})

@@ -2,15 +2,12 @@ package controller
 
 import (
 	"net/http"
-	"task_manager_api/data"
 	domain "task_manager_api/Domain"
+	"task_manager_api/Infrastructure"
+	"task_manager_api/data"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
-
-var jwtSecret = []byte("slkfjaslfjdjf!@#$!@#ASDFASDf")
 
 func GetTasks(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, data.GetTasks())
@@ -39,21 +36,17 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginData.Password)); err != nil {
+	if !Infrastructure.CheckPasswordHash(loginData.Password, user.Password) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": user.UserName,
-		"role":     user.UserRole,
-	})
-	jwtToken, err := token.SignedString(jwtSecret)
+	token, err := Infrastructure.GenerateJWT(user.UserName, user.UserRole)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"token": jwtToken})
+	ctx.JSON(http.StatusOK, gin.H{"token": token})
 }
 
 func RegisterUser(ctx *gin.Context) {
@@ -64,7 +57,7 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
+	hashedPassword, err := Infrastructure.HashPassword(newUser.Password)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
