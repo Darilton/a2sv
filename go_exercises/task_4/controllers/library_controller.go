@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"library_management/models"
 	"library_management/services"
+	"library_management/concurrency"
 	"os"
 	"strings"
 )
@@ -14,6 +15,7 @@ var lib services.Library
 func Init() {
 	lib.Books = make(map[int]models.Book)
 	lib.Member = make(map[int]models.Member)
+	concurrency.Init(2, lib)
 }
 
 func RemoveBook() {
@@ -41,6 +43,12 @@ func ListAvailableBooks() {
 		fmt.Println("Book Title: ", book.Title)
 		fmt.Println("Book Author: ", book.Author)
 		fmt.Println()
+	}
+}
+
+func ReserveBook() {
+	for i := 0; i < 10; i++ {
+		concurrency.ReserveBook(i, i)
 	}
 }
 
@@ -113,6 +121,25 @@ func AddNewMember() {
 	lib.AddMember(member)
 	fmt.Println("Member Added Successfuly!")
 	fmt.Println()
+}
+func ListReservedBooks() {
+	var memberID int
+	fmt.Println("*********Reserved Books Listing Menu*********")
+	fmt.Print("Member Id: ")
+	fmt.Scanf("%d", &memberID)
+
+	borrowedBooks := lib.ListReservedBooks(memberID)
+	if len(borrowedBooks) == 0 {
+		fmt.Println("No books borowed by given member")
+	} else {
+		fmt.Println("*********Borrowed Books by Given Member*********")
+	}
+	for _, book := range borrowedBooks {
+		fmt.Println("Book Id: ", book.ID)
+		fmt.Println("Book Title: ", book.Title)
+		fmt.Println("Book Author: ", book.Author)
+		fmt.Println()
+	}
 }
 
 func ListBorrowedBooks() {

@@ -7,6 +7,7 @@ import (
 
 func main() {
 	controllers.Init()
+
 	opt := 1
 	for opt != 0 {
 		fmt.Println("*********Lib, Library Management System*********")
@@ -19,6 +20,8 @@ func main() {
 		fmt.Println("6 List all available books")
 		fmt.Println("7 List Registered Members")
 		fmt.Println("8 List all borrowed books by a member")
+		fmt.Println("9 Reserve Book")
+		fmt.Println("10 List all reserved books by a member")
 		fmt.Println("0 Exit")
 		fmt.Print("opt: ")
 		fmt.Scanf("%d", &opt)
@@ -43,6 +46,10 @@ func main() {
 			controllers.ListMembers()
 		case 8:
 			controllers.ListBorrowedBooks()
+		case 9:
+			controllers.ReserveBook()
+		case 10:
+			controllers.ListReservedBooks()
 		}
 		if opt != 0 {
 			fmt.Println("Press Enter to go back to main menu")
