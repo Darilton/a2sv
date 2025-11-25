@@ -47,8 +47,8 @@ func ListAvailableBooks() {
 }
 
 func ReserveBook() {
-	for i := range 10 {
-		concurrency.Reserve_book(i, i)
+	for i := 0; i < 10; i++ {
+		concurrency.ReserveBook(i, i)
 	}
 }
 

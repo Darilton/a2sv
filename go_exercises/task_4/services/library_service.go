@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"library_management/models"
+	"sync"
 )
 
 type LibraryManager interface {
@@ -16,7 +17,7 @@ type LibraryManager interface {
 	BorrowBook(bookID int, memberID int) error
 	ReturnBook(memberID, bookID int) error
 	ReserveBook(bookID int, memberID int) error
-	UnReserveBook(booID int, memberID int)
+	UnReserveBook(bookID int, memberID int) error
 }
 
 type Library struct {
@@ -24,12 +25,15 @@ type Library struct {
 	Member map[int]models.Member
 }
 
-func (l Library) BorrowBook(bookID int, memberID int) error {
+func (l *Library) BorrowBook(bookID int, memberID int) error {
+	// Enter critical region
 	book, ok := l.Books[bookID]
 	if !ok {
 		return errors.New("book not found in library")
 	}
 
+	book.Mu.Lock()
+	defer book.Mu.Unlock()
 	if book.Status == "Borrowed" {
 		return errors.New("book is currently not available")
 	}
@@ -48,6 +52,7 @@ func (l Library) BorrowBook(bookID int, memberID int) error {
 }
 
 func (l Library) AddBook(book models.Book) {
+	book.Mu = &sync.Mutex{}
 	l.Books[book.ID] = book
 }
 
@@ -88,7 +93,7 @@ func (l Library) UnReserveBook(bookID int, memberID int) error {
 	}
 
 	book_idx := -1 // flag as not found
-	for i := range len(member.ReservedBooks) {
+	for i := range member.ReservedBooks {
 		book := member.ReservedBooks[i]
 		if book.ID == bookID {
 			book_idx = i
@@ -117,7 +122,7 @@ func (l Library) ReturnBook(memberID, bookID int) error {
 	}
 
 	book_idx := -1 // flag as not found
-	for i := range len(member.BorrowedBooks) {
+	for i := range member.BorrowedBooks {
 		book := member.BorrowedBooks[i]
 		if book.ID == bookID {
 			book_idx = i

@@ -25,12 +25,13 @@ func auto_cancel_reservation(r reservation) {
 		fmt.Printf("%s\n",err.Error())
 	}
 }
+
 func Init(worker_count int, _lib services.Library) {
 	reserved_chan = make(chan reservation)
 	reserve_chan = make(chan reservation)
 	lib = _lib
 
-	for range worker_count {
+	for i := 0; i < worker_count; i++ {
 		go reservation_worker()
 	}
 
@@ -41,7 +42,7 @@ func Init(worker_count int, _lib services.Library) {
 	}()
 }
 
-func Reserve_book(bookId, memberId int) {
+func ReserveBook(bookId, memberId int) {
 	reserve_chan <- reservation{bookId: bookId, memberId: memberId}
 }
 
