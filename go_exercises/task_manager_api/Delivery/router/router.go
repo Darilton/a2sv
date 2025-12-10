@@ -7,16 +7,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetRouter() *gin.Engine {
+func GetRouter(tc *controller.TaskController) *gin.Engine {
 	router := gin.Default()
 
-	router.GET("/tasks", middleware.AuthMiddleware(), controller.GetTasks)
-	router.GET("/tasks/:id", middleware.AuthMiddleware(), controller.GetTask)
-	router.PUT("/tasks/:id", middleware.AuthMiddleware(), middleware.CheckAdminMiddleware(), controller.PutTask)
-	router.DELETE("/tasks/:id", middleware.AuthMiddleware(), middleware.CheckAdminMiddleware(), controller.DeleteTask)
-	router.POST("/tasks", middleware.AuthMiddleware(), middleware.CheckAdminMiddleware(), controller.AddTask)
+	router.GET("/tasks", middleware.AuthMiddleware(), tc.GetTasks)
+	router.GET("/tasks/:id", middleware.AuthMiddleware(), tc.GetTask)
+	router.PUT("/tasks/:id", middleware.AuthMiddleware(), middleware.CheckAdminMiddleware(), tc.PutTask)
+	router.DELETE("/tasks/:id", middleware.AuthMiddleware(), middleware.CheckAdminMiddleware(), tc.DeleteTask)
+	router.POST("/tasks", middleware.AuthMiddleware(), middleware.CheckAdminMiddleware(), tc.AddTask)
 
-	router.POST("/register", controller.RegisterUser)
-	router.POST("/login", controller.LoginUser)
+	router.POST("/register", tc.RegisterUser)
+	router.POST("/login", tc.LoginUser)
 	return router
 }

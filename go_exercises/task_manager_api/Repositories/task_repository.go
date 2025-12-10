@@ -10,7 +10,6 @@ import (
 )
 
 type TaskRepository interface {
-	SetTaskCollection(collection *mongo.Collection)
 	AddTask(newTask domain.Task) error
 	GetTask(id string) (domain.Task, error)
 	GetTasks() []domain.Task
@@ -18,34 +17,38 @@ type TaskRepository interface {
 	DeleteTask(id string) error
 }
 
-var taskColl *mongo.Collection
-
-func SetTaskCollection(collection *mongo.Collection) {
-	taskColl = collection
+type TaskRepositoryMongo struct {
+	collection *mongo.Collection
 }
 
-func AddTask(newTask domain.Task) error {
+func NewTaskRepository(collection *mongo.Collection) TaskRepository {
+	return &TaskRepositoryMongo{
+		collection: collection,
+	}
+}
+
+func (tr *TaskRepositoryMongo) AddTask(newTask domain.Task) error {
 	if newTask.Id == "" || newTask.Title == "" {
 		return errors.New("invalid Request")
 	}
-	if _, err := taskColl.InsertOne(context.TODO(), newTask); err != nil {
+	if _, err := tr.collection.InsertOne(context.TODO(), newTask); err != nil {
 		return err
 	}
 	return nil
 }
 
-func GetTask(id string) (domain.Task, error) {
+func (tr *TaskRepositoryMongo) GetTask(id string) (domain.Task, error) {
 	var task domain.Task
-	err := taskColl.FindOne(context.TODO(), bson.D{{Key: "id", Value: id}}).Decode(&task)
+	err := tr.collection.FindOne(context.TODO(), bson.D{{Key: "id", Value: id}}).Decode(&task)
 	if err != nil {
 		return task, errors.New("task Not found")
 	}
 	return task, nil
 }
 
-func GetTasks() []domain.Task {
+func (tr *TaskRepositoryMongo) GetTasks() []domain.Task {
 	ans := make([]domain.Task, 0)
-	cur, err := taskColl.Find(context.TODO(), bson.D{{}})
+	cur, err := tr.collection.Find(context.TODO(), bson.D{{}})
 	if err != nil {
 		return ans
 	}
@@ -57,12 +60,15 @@ func GetTasks() []domain.Task {
 	return ans
 }
 
-func EditTask(id string, newTask domain.Task) error {
+func (tr *TaskRepositoryMongo) EditTask(id string, newTask domain.Task) error {
 	if id != newTask.Id {
 		return errors.New("invalid Request")
 	}
 
-	updateResult, _ := taskColl.ReplaceOne(context.TODO(), bson.D{{Key: "id", Value: id}}, newTask)
+	updateResult, err := tr.collection.ReplaceOne(context.TODO(), bson.D{{Key: "id", Value: id}}, newTask)
+	if err != nil {
+		return err
+	}
 	if updateResult.MatchedCount == 0 {
 		return errors.New("task with given id not found")
 	}
@@ -70,8 +76,11 @@ func EditTask(id string, newTask domain.Task) error {
 	return nil
 }
 
-func DeleteTask(id string) error {
-	deleteResult, _ := taskColl.DeleteOne(context.TODO(), bson.D{{Key: "id", Value: id}})
+func (tr *TaskRepositoryMongo) DeleteTask(id string) error {
+	deleteResult, err := tr.collection.DeleteOne(context.TODO(), bson.D{{Key: "id", Value: id}})
+	if err != nil {
+		return err
+	}
 	if deleteResult.DeletedCount == 0 {
 		return errors.New("task with given id not found")
 	}

@@ -5,22 +5,32 @@ import (
 	"task_manager_api/Repositories"
 )
 
-func EditTask(id string, newTask domain.Task) error {
-	return Repositories.EditTask(id, newTask)
+type TaskUseCase struct {
+	taskRepo Repositories.TaskRepository
 }
 
-func DeleteTask(id string) error {
-	return Repositories.DeleteTask(id)
+func NewTaskUseCase(taskRepo Repositories.TaskRepository) *TaskUseCase {
+	return &TaskUseCase{
+		taskRepo: taskRepo,
+	}
 }
 
-func AddTask(newTask domain.Task) error {
-	return Repositories.AddTask(newTask)
+func (tu *TaskUseCase) EditTask(id string, newTask domain.Task) error {
+	return tu.taskRepo.EditTask(id, newTask)
 }
 
-func GetTask(id string) (domain.Task, error) {
-	return Repositories.GetTask(id)
+func (tu *TaskUseCase) DeleteTask(id string) error {
+	return tu.taskRepo.DeleteTask(id)
 }
 
-func GetTasks() []domain.Task {
-	return Repositories.GetTasks()
+func (tu *TaskUseCase) AddTask(newTask domain.Task) error {
+	return tu.taskRepo.AddTask(newTask)
+}
+
+func (tu *TaskUseCase) GetTask(id string) (domain.Task, error) {
+	return tu.taskRepo.GetTask(id)
+}
+
+func (tu *TaskUseCase) GetTasks() []domain.Task {
+	return tu.taskRepo.GetTasks()
 }

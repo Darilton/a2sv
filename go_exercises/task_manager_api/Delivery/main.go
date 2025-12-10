@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"task_manager_api/Delivery/controller"
 	"task_manager_api/Delivery/router"
 	"task_manager_api/Repositories"
+	usecases "task_manager_api/UseCases"
 
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -19,10 +21,17 @@ func main() {
 		return
 	}
 
-	// Set collections to use for each service class
-	Repositories.SetTaskCollection(clnt.Database(db).Collection("tasks"))
-	Repositories.SetUserCollection(clnt.Database(db).Collection("users"))
+	// Initialize Repositories
+	taskRepo := Repositories.NewTaskRepository(clnt.Database(db).Collection("tasks"))
+	userRepo := Repositories.NewUserRepository(clnt.Database(db).Collection("users"))
 
-	app := router.GetRouter()
+	// Initialize UseCases
+	taskUseCase := usecases.NewTaskUseCase(taskRepo)
+	userUseCase := usecases.NewUserUseCase(userRepo)
+
+	// Initialize Controller
+	taskController := controller.NewTaskController(taskUseCase, userUseCase)
+
+	app := router.GetRouter(taskController)
 	app.Run(":8080")
 }

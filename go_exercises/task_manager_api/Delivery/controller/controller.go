@@ -3,18 +3,29 @@ package controller
 import (
 	"net/http"
 	domain "task_manager_api/Domain"
-	"task_manager_api/Repositories"
 	usecases "task_manager_api/UseCases"
 
 	"github.com/gin-gonic/gin"
 )
 
-func GetTasks(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, Repositories.GetTasks())
+type TaskController struct {
+	taskUseCase *usecases.TaskUseCase
+	userUseCase *usecases.UserUseCase
 }
 
-func GetTask(ctx *gin.Context) {
-	task, err := usecases.GetTask(ctx.Param("id"))
+func NewTaskController(taskUseCase *usecases.TaskUseCase, userUseCase *usecases.UserUseCase) *TaskController {
+	return &TaskController{
+		taskUseCase: taskUseCase,
+		userUseCase: userUseCase,
+	}
+}
+
+func (tc *TaskController) GetTasks(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, tc.taskUseCase.GetTasks())
+}
+
+func (tc *TaskController) GetTask(ctx *gin.Context) {
+	task, err := tc.taskUseCase.GetTask(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
@@ -22,7 +33,7 @@ func GetTask(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, task)
 }
 
-func LoginUser(ctx *gin.Context) {
+func (tc *TaskController) LoginUser(ctx *gin.Context) {
 	var loginData domain.User
 
 	if err := ctx.ShouldBindBodyWithJSON(&loginData); err != nil {
@@ -30,7 +41,7 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 
-	token, err := usecases.LoginUser(loginData)
+	token, err := tc.userUseCase.LoginUser(loginData)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
@@ -38,7 +49,7 @@ func LoginUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"token": token})
 }
 
-func RegisterUser(ctx *gin.Context) {
+func (tc *TaskController) RegisterUser(ctx *gin.Context) {
 	var newUser domain.User
 
 	if err := ctx.ShouldBindBodyWithJSON(&newUser); err != nil {
@@ -46,7 +57,7 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 
-	if err := usecases.RegisterUser(newUser); err != nil {
+	if err := tc.userUseCase.RegisterUser(newUser); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -54,37 +65,37 @@ func RegisterUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "User Registered Successfully"})
 }
 
-func AddTask(ctx *gin.Context) {
+func (tc *TaskController) AddTask(ctx *gin.Context) {
 	var newTask domain.Task
 
 	if err := ctx.ShouldBindBodyWithJSON(&newTask); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := usecases.AddTask(newTask); err != nil {
+	if err := tc.taskUseCase.AddTask(newTask); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "Task Added Successfully"})
 }
 
-func PutTask(ctx *gin.Context) {
+func (tc *TaskController) PutTask(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var newTask domain.Task
 	if err := ctx.ShouldBindBodyWithJSON(&newTask); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := usecases.EditTask(id, newTask); err != nil {
+	if err := tc.taskUseCase.EditTask(id, newTask); err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "Task Updated Successfully!"})
 }
 
-func DeleteTask(ctx *gin.Context) {
+func (tc *TaskController) DeleteTask(ctx *gin.Context) {
 	id := ctx.Param("id")
-	if err := usecases.DeleteTask(id); err != nil {
+	if err := tc.taskUseCase.DeleteTask(id); err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}

@@ -263,3 +263,34 @@ curl -X POST http://localhost:8080/tasks \
   -H "Content-Type: application/json" \
   -d '{"id":"3","title":"Task 3","description":"Third task","due_date":"2025-11-08T00:00:00Z","status":"Completed"}'
 ```
+# Task Management API - Testing Suite
+
+This directory contains the testing suite for the Task Management API, implemented using `testify`.
+
+## Folder Structure
+
+- `mocks/`: Generated mocks for Repositories.
+- `infrastructure/`: Unit tests for infrastructure services (Password, JWT).
+- `usecases/`: Unit tests for UseCases using Mocks.
+- `middleware/`: Unit tests for Gin Middleware using `httptest`.
+- `controllers/`: Integration-style tests for Controllers/Routers using `httptest` and Mocks.
+- `repositories_integration/`: Integration tests for Repositories using a real MongoDB instance.
+
+## Running Tests
+
+To run all tests with coverage:
+
+```bash
+go test ./Tests/... -cover
+```
+
+To run a specific package:
+
+```bash
+go test ./Tests/usecases/... -v
+```
+
+## Requirements
+
+- MongoDB must be running on `localhost:27017` for integration tests.
+- `go mod tidy` should be run to ensure all dependencies are installed.
